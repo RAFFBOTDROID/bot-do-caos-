@@ -1,14 +1,12 @@
 import os
 import asyncio
 import random
-from aiohttp import web, ClientSession
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-TOKEN = os.getenv("TOKEN")
-PORT = int(os.environ.get("PORT", 10000))  # porta do Render
+TOKEN = os.getenv("TOKEN")  # Coloque seu token do bot aqui ou em variáveis de ambiente
 
-# ===== Listas de frases e gifs =====
+# Mensagens finais para quando o caos termina
 frases_finais = [
     "🔥 ACORDA GRUPOOO!!!",
     "💀 SUMIU TODO MUNDO???",
@@ -20,15 +18,17 @@ frases_finais = [
     "💣 CONVOCAÇÃO NÍVEL APOCALIPSE",
 ]
 
+# GIFs animados para enviar
 gifs_caos = [
     "https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif",
     "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
     "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
 ]
 
-# ===== Comandos do Bot =====
+# Comando /convocar
 async def convocar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
+
     msg = await context.bot.send_message(chat_id, "💣 INICIANDO CONVOCAÇÃO EXPLOSIVA...")
     await asyncio.sleep(1)
 
@@ -54,9 +54,11 @@ async def convocar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     frase = random.choice(frases_finais)
     await context.bot.edit_message_text(f"🔥💥 TODOS CONVOCADOS!!! {frase}", chat_id, msg.message_id)
+
     await context.bot.send_animation(chat_id, random.choice(gifs_caos))
 
 
+# Comando /caos
 async def caos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     respostas = [
         "💥 CAOS ATIVO!!!",
@@ -69,44 +71,15 @@ async def caos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(random.choice(respostas))
 
 
-# ===== Servidor web e ping =====
-async def keep_alive():
-    async def handler(request):
-        return web.Response(text="Bot do Caos Online 🔥")
-
-    app_web = web.Application()
-    app_web.router.add_get("/", handler)
-    runner = web.AppRunner(app_web)
-    await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", PORT)
-    await site.start()
-    print(f"💻 Servidor web ativo na porta {PORT}")
-
-    # Ping interno a cada 10 minutos
-    async with ClientSession() as session:
-        while True:
-            try:
-                await session.get(f"http://localhost:{PORT}/")
-                print("💡 Ping interno executado para manter o Render ativo")
-            except Exception as e:
-                print("⚠️ Erro no ping interno:", e)
-            await asyncio.sleep(600)  # 10 minutos
-
-
-# ===== Inicialização =====
+# Função principal
 async def main():
     app = ApplicationBuilder().token(TOKEN).build()
+
     app.add_handler(CommandHandler("convocar", convocar))
     app.add_handler(CommandHandler("caos", caos))
 
     print("💥 BOT CAOS ABSOLUTO ONLINE EM PYTHON 3.13 🔥")
-
-    # Executa bot + servidor web com ping juntos
-    await asyncio.gather(
-        keep_alive(),
-        app.run_polling()
-    )
-
+    await app.run_polling()  # Polling puro, sem aiohttp
 
 if __name__ == "__main__":
     asyncio.run(main())
