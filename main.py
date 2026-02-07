@@ -3,7 +3,6 @@ import asyncio
 import random
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from aiohttp import web
 
 TOKEN = os.getenv("TOKEN")
 
@@ -64,32 +63,13 @@ async def caos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     await update.message.reply_text(random.choice(respostas))
 
-# Mantém o bot vivo no Render Free
-async def keep_alive():
-    async def handler(request):
-        return web.Response(text="Bot do Caos Online 🔥")
-
-    app_web = web.Application()
-    app_web.router.add_get("/", handler)
-    port = int(os.environ.get("PORT", 10000))
-    runner = web.AppRunner(app_web)
-    await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", port)
-    await site.start()
-    print(f"💻 Servidor web ativo na porta {port}")
-
 async def main():
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("convocar", convocar))
     app.add_handler(CommandHandler("caos", caos))
 
     print("💥 BOT CAOS ABSOLUTO ONLINE EM PYTHON 3.13 🔥")
-
-    # Inicia o “servidor web” paralelo e o polling
-    await asyncio.gather(
-        keep_alive(),
-        app.run_polling()
-    )
+    await app.run_polling()
 
 if __name__ == "__main__":
     asyncio.run(main())
