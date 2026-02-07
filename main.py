@@ -1,5 +1,4 @@
 import os
-import asyncio
 import random
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
@@ -26,7 +25,6 @@ gifs_caos = [
 async def convocar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     msg = await context.bot.send_message(chat_id, "💣 INICIANDO CONVOCAÇÃO EXPLOSIVA...")
-    await asyncio.sleep(1)
 
     efeitos = [
         "🚨🚨 ALERTA MÁXIMO 🚨🚨",
@@ -37,6 +35,7 @@ async def convocar(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🧨 PREPARANDO EXPLOSÃO SOCIAL",
     ]
 
+    import asyncio
     for efeito in efeitos:
         await context.bot.edit_message_text(efeito, chat_id, msg.message_id)
         await asyncio.sleep(1)
@@ -63,13 +62,13 @@ async def caos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     await update.message.reply_text(random.choice(respostas))
 
-async def main():
+def main():
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("convocar", convocar))
     app.add_handler(CommandHandler("caos", caos))
 
     print("💥 BOT CAOS ABSOLUTO ONLINE EM PYTHON 3.13 🔥")
-    await app.run_polling()
+    app.run_polling()  # chama o polling direto, sem asyncio.run
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
