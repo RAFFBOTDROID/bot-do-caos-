@@ -1,9 +1,9 @@
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import os
 import asyncio
 import random
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-import os
 TOKEN = os.getenv("TOKEN")
 
 frases_finais = [
@@ -25,7 +25,7 @@ gifs_caos = [
 
 async def convocar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
-    
+
     msg = await context.bot.send_message(chat_id, "💣 INICIANDO CONVOCAÇÃO EXPLOSIVA...")
     await asyncio.sleep(1)
 
@@ -51,11 +51,15 @@ async def convocar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.edit_message_text("1️⃣ VAI EXPLODIR 💥", chat_id, msg.message_id)
     await asyncio.sleep(1)
 
-    frase_final = random.choice(frases_finais)
-    await context.bot.edit_message_text(f"🔥💥 TODOS CONVOCADOS!!! {frase_final}", chat_id, msg.message_id)
+    frase = random.choice(frases_finais)
+    await context.bot.edit_message_text(
+        f"🔥💥 TODOS CONVOCADOS!!! {frase}",
+        chat_id,
+        msg.message_id
+    )
 
-    gif = random.choice(gifs_caos)
-    await context.bot.send_animation(chat_id, gif)
+    await context.bot.send_animation(chat_id, random.choice(gifs_caos))
+
 
 async def caos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     respostas = [
@@ -68,15 +72,16 @@ async def caos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     await update.message.reply_text(random.choice(respostas))
 
+
 async def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("convocar", convocar))
     app.add_handler(CommandHandler("caos", caos))
 
-    print("💥 BOT CAOS ABSOLUTO RODANDO...")
+    print("💥 BOT CAOS ABSOLUTO ONLINE EM PYTHON 3.13 🔥")
     await app.run_polling()
 
+
 if __name__ == "__main__":
-    import asyncio
     asyncio.run(main())
