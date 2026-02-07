@@ -52,11 +52,7 @@ async def convocar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await asyncio.sleep(1)
 
     frase = random.choice(frases_finais)
-    await context.bot.edit_message_text(
-        f"🔥💥 TODOS CONVOCADOS!!! {frase}",
-        chat_id,
-        msg.message_id
-    )
+    await context.bot.edit_message_text(f"🔥💥 TODOS CONVOCADOS!!! {frase}", chat_id, msg.message_id)
 
     await context.bot.send_animation(chat_id, random.choice(gifs_caos))
 
@@ -73,15 +69,16 @@ async def caos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(random.choice(respostas))
 
 
-async def main():
+def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("convocar", convocar))
     app.add_handler(CommandHandler("caos", caos))
 
     print("💥 BOT CAOS ABSOLUTO ONLINE EM PYTHON 3.13 🔥")
-    await app.run_polling()
+
+    app.run_polling()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
