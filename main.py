@@ -1,12 +1,10 @@
 import os
-import asyncio
 import random
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-TOKEN = os.getenv("TOKEN")  # Coloque seu token do bot aqui ou em variáveis de ambiente
+TOKEN = os.getenv("TOKEN")
 
-# Mensagens finais para quando o caos termina
 frases_finais = [
     "🔥 ACORDA GRUPOOO!!!",
     "💀 SUMIU TODO MUNDO???",
@@ -18,19 +16,15 @@ frases_finais = [
     "💣 CONVOCAÇÃO NÍVEL APOCALIPSE",
 ]
 
-# GIFs animados para enviar
 gifs_caos = [
     "https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif",
     "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
     "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif",
 ]
 
-# Comando /convocar
 async def convocar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
-
     msg = await context.bot.send_message(chat_id, "💣 INICIANDO CONVOCAÇÃO EXPLOSIVA...")
-    await asyncio.sleep(1)
 
     efeitos = [
         "🚨🚨 ALERTA MÁXIMO 🚨🚨",
@@ -54,11 +48,9 @@ async def convocar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     frase = random.choice(frases_finais)
     await context.bot.edit_message_text(f"🔥💥 TODOS CONVOCADOS!!! {frase}", chat_id, msg.message_id)
-
     await context.bot.send_animation(chat_id, random.choice(gifs_caos))
 
 
-# Comando /caos
 async def caos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     respostas = [
         "💥 CAOS ATIVO!!!",
@@ -71,15 +63,11 @@ async def caos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(random.choice(respostas))
 
 
-# Função principal
-async def main():
+if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
-
     app.add_handler(CommandHandler("convocar", convocar))
     app.add_handler(CommandHandler("caos", caos))
 
     print("💥 BOT CAOS ABSOLUTO ONLINE EM PYTHON 3.13 🔥")
-    await app.run_polling()  # Polling puro, sem aiohttp
-
-if __name__ == "__main__":
-    asyncio.run(main())
+    # Aqui rodamos direto o polling, sem asyncio.run()
+    app.run_polling()
